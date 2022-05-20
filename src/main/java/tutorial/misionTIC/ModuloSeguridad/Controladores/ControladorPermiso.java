@@ -28,17 +28,22 @@ public class ControladorPermiso {
     public Permiso show(@PathVariable String id){
         Permiso permisoActual=this.miRepositorioPermiso
                 .findById(id)
-                .orElseThrow(RuntimeException::new);
+                .orElse(null);
         return permisoActual;
     }
     @PutMapping("{id}")
     public Permiso update(@PathVariable String id,@RequestBody  Permiso infoPermiso){
         Permiso permisoActual=this.miRepositorioPermiso
                 .findById(id)
-                .orElseThrow(RuntimeException::new);
-        permisoActual.setMetodo(infoPermiso.getMetodo());
-        permisoActual.setUrl(infoPermiso.getUrl());
-        return this.miRepositorioPermiso.save(permisoActual);
+                .orElse(null);
+        if(permisoActual!=null){
+            permisoActual.setMetodo(infoPermiso.getMetodo());
+            permisoActual.setUrl(infoPermiso.getUrl());
+            return this.miRepositorioPermiso.save(permisoActual);
+        }else{
+            return null;
+        }
+
     }
 
     @ResponseStatus(HttpStatus.NO_CONTENT)
@@ -46,7 +51,9 @@ public class ControladorPermiso {
     public void delete(@PathVariable String id){
         Permiso permisoActual=this.miRepositorioPermiso
                 .findById(id)
-                .orElseThrow(RuntimeException::new);
-        this.miRepositorioPermiso.delete(permisoActual);
+                .orElse(null);
+        if (permisoActual!=null){
+            this.miRepositorioPermiso.delete(permisoActual);
+        }
     }
 }

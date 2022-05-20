@@ -41,15 +41,19 @@ public class ControladorPermisosRoles {
         PermisosRoles nuevo=new PermisosRoles();
         Rol elRol=this.miRepositorioRol.findById(id_rol).get();
         Permiso elPermiso=this.miRepositorioPermiso.findById(id_permiso).get();
-        nuevo.setPermiso(elPermiso);
-        nuevo.setRol(elRol);
-        return this.miRepositorioPermisoRoles.save(nuevo);
+        if (elRol!=null && elPermiso!=null){
+            nuevo.setPermiso(elPermiso);
+            nuevo.setRol(elRol);
+            return this.miRepositorioPermisoRoles.save(nuevo);
+        }else{
+            return null;
+        }
     }
     @GetMapping("{id}")
     public PermisosRoles show(@PathVariable String id){
         PermisosRoles permisosRolesActual=this.miRepositorioPermisoRoles
                 .findById(id)
-                .orElseThrow(RuntimeException::new);
+                .orElse(null);
         return permisosRolesActual;
     }
 
@@ -64,12 +68,16 @@ public class ControladorPermisosRoles {
     public PermisosRoles update(@PathVariable String id,@PathVariable String id_rol,@PathVariable String id_permiso){
         PermisosRoles permisosRolesActual=this.miRepositorioPermisoRoles
                 .findById(id)
-                .orElseThrow(RuntimeException::new);
+                .orElse(null);
         Rol elRol=this.miRepositorioRol.findById(id_rol).get();
         Permiso elPermiso=this.miRepositorioPermiso.findById(id_permiso).get();
-        permisosRolesActual.setPermiso(elPermiso);
-        permisosRolesActual.setRol(elRol);
-        return this.miRepositorioPermisoRoles.save(permisosRolesActual);
+        if(permisosRolesActual!=null && elPermiso!=null && elRol!=null){
+            permisosRolesActual.setPermiso(elPermiso);
+            permisosRolesActual.setRol(elRol);
+            return this.miRepositorioPermisoRoles.save(permisosRolesActual);
+        }else{
+            return null;
+        }
     }
 
     @ResponseStatus(HttpStatus.NO_CONTENT)
@@ -77,8 +85,9 @@ public class ControladorPermisosRoles {
     public void delete(@PathVariable String id){
         PermisosRoles permisosRolesActual=this.miRepositorioPermisoRoles
                 .findById(id)
-                .orElseThrow(RuntimeException::new);
-        this.miRepositorioPermisoRoles.delete(permisosRolesActual);
+                .orElse(null);
+        if (permisosRolesActual!=null){
+            this.miRepositorioPermisoRoles.delete(permisosRolesActual);
+        }
     }
-
 }

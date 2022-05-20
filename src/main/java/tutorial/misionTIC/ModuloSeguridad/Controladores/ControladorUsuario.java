@@ -21,7 +21,6 @@ public class ControladorUsuario {
     public List<Usuario> index(){
         return this.miRepositorioUsuario.findAll();
     }
-
     @ResponseStatus(HttpStatus.CREATED)
     @PostMapping
     public Usuario create(@RequestBody  Usuario infoUsuario){
@@ -30,29 +29,30 @@ public class ControladorUsuario {
     }
     @GetMapping("{id}")
     public Usuario show(@PathVariable String id){
-        Usuario usuarioActual=this.miRepositorioUsuario
-                .findById(id)
-                .orElseThrow(RuntimeException::new);
+        Usuario usuarioActual=this.miRepositorioUsuario.findById(id).orElse(null);
         return usuarioActual;
     }
     @PutMapping("{id}")
     public Usuario update(@PathVariable String id,@RequestBody  Usuario infoUsuario){
-        Usuario usuarioActual=this.miRepositorioUsuario
-                .findById(id)
-                .orElseThrow(RuntimeException::new);
-        usuarioActual.setSeudonimo(infoUsuario.getSeudonimo());
-        usuarioActual.setCorreo(infoUsuario.getCorreo());
-        usuarioActual.setContrasena(convertirSHA256(infoUsuario.getContrasena()));
-        return this.miRepositorioUsuario.save(usuarioActual);
+        Usuario usuarioActual=this.miRepositorioUsuario.findById(id).orElse(null);
+        if (usuarioActual!=null){
+            usuarioActual.setSeudonimo(infoUsuario.getSeudonimo());
+            usuarioActual.setCorreo(infoUsuario.getCorreo());
+            usuarioActual.setContrasena(convertirSHA256(infoUsuario.getContrasena()));
+            return this.miRepositorioUsuario.save(usuarioActual);
+        }else{
+            return null;
+        }
     }
-
     @ResponseStatus(HttpStatus.NO_CONTENT)
     @DeleteMapping("{id}")
     public void delete(@PathVariable String id){
         Usuario usuarioActual=this.miRepositorioUsuario
                 .findById(id)
-                .orElseThrow(RuntimeException::new);
-        this.miRepositorioUsuario.delete(usuarioActual);
+                .orElse(null);
+        if (usuarioActual!=null){
+            this.miRepositorioUsuario.delete(usuarioActual);
+        }
     }
     /**
      * Relación (1 a n) entre rol y usuario
@@ -64,12 +64,17 @@ public class ControladorUsuario {
     public Usuario asignarRolAUsuario(@PathVariable String id,@PathVariable String id_rol){
         Usuario usuarioActual=this.miRepositorioUsuario
                                     .findById(id)
-                                    .orElseThrow(RuntimeException::new);
+                                    .orElse(null);
         Rol rolActual=this.miRepositorioRol
                                     .findById(id_rol)
-                                    .orElseThrow(RuntimeException::new);
-        usuarioActual.setRol(rolActual);
-        return this.miRepositorioUsuario.save(usuarioActual);
+                                    .orElse(null);
+        if (usuarioActual!=null && rolActual!=null){
+            usuarioActual.setRol(rolActual);
+            return this.miRepositorioUsuario.save(usuarioActual);
+        }else{
+            return null;
+        }
+
     }
 
     public String convertirSHA256(String password) {
